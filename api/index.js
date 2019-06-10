@@ -2,16 +2,41 @@
 
 // dependencies
 const http = require('http')
+const https = require('https')
 const url = require('url')
 const StringDecoder = require('string_decoder').StringDecoder
-
-// config
-const port = 4000
+const config = require('./config')
+const fs = require('fs')
 
 const decoder = new StringDecoder('utf-8')
 
-// create server
-const server = http.createServer((req, res) => {
+// create HTTP server
+const httpServer = http.createServer((req, res) => {
+  unifiedServer(req, res)
+})
+
+// create HTTPS server
+const httpsOptions = {
+  key: fs.readFileSync('./certificates/key.pem'),
+  cert: fs.readFileSync('./certificates/cert.pem'),
+}
+
+const httpsServer = https.createServer(httpsOptions, (req, res) => {
+  unifiedServer(req, res)
+})
+
+// TODO: HTTP/2?
+
+httpServer.listen(config.port, () => {
+  console.log(`HTTP server is listening on port ${config.port}`)
+})
+
+httpsServer.listen(config.httpsPort, () => {
+  console.log(`HTTPS server is listening on port ${config.httpsPort}`)
+})
+
+// common server logic
+const unifiedServer = (req, res) => {
 
   // get the url and parse it
   const parsedUrl = url.parse(req.url, true)
@@ -67,12 +92,7 @@ const server = http.createServer((req, res) => {
       res.end()
     })
   })
-})
-
-server.listen(port, () => {
-  console.log(`server is listening on port ${port}`)
-})
-
+}
 
 const routers = {
   notFound: function (reqData, cb) {
