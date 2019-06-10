@@ -96,12 +96,14 @@ const unifiedServer = (req, res) => {
 
 const routers = {
   notFound: function (reqData, cb) {
-    return cb(null, { status: 404 })
+    return cb(null, {
+      status: 404
+    })
   },
-  sample: function (reqData, cb) {
-    return cb(null, {status: 200, body: 'hallo'})
-  },
-  jason: function (reqData, cb) {
-    return cb(null, {status: 200, body: { id: '22' }})
+  ping: function (reqData, cb) {
+    return cb(null, {
+      status: 200,
+      body: 'pong'
+    })
   }
 }
